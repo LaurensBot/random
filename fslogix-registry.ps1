@@ -3,8 +3,6 @@ param (
     [Parameter()]
     [string]$profileLocation,
 
-    [Parameter()]
-    [string]$officeLocation
 )
 try {
     Write-Information "Enabling Kerberos functions"
@@ -41,23 +39,6 @@ try {
 }
 catch {
     Throw "Configuring FSLogix profile location not succesfully, $_"
-}
-
-try {
-    if ($officeLocation) {
-        # FSlogix Office container
-        Write-Information "Configuring fslogix profile location"
-        $fslogixOfficePath = "HKLM:\Software\FSLogix\ODFS"
-        if (!(Test-Path $fslogixOfficePath)) {
-            New-Item -Path $fslogixOfficePath -Force | Out-Null
-        }
-        New-ItemProperty -Path $fslogixOfficePath -Name Enabled -Value 1 -PropertyType DWORD -Force | Out-Null
-        New-ItemProperty -Path $fslogixOfficePath -Name VHDLocations -Value $officeLocation -PropertyType String -Force | Out-Null
-        New-ItemProperty -Path $fslogixOfficePath -Name DeleteLocalProfileWhenVHDShouldApply -Value 1 -PropertyType DWORD -Force | Out-Null
-    }
-}
-catch {
-    Throw "Configuring FSLogix office location not succesfully, $_"
 }
 
 Restart-Computer -ComputerName $env:COMPUTERNAME
